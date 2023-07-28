@@ -5,8 +5,8 @@ The Web Article Summarizer is a tool designed to summarize and analyze articles 
 1. [Overview](#implementation-overview)
 2. [Data](#data-for-training)
 3. [Models & Techniques](#models-and-techniques)
-4. [Input Processing](feed-input-processing)
-5. [Interface](front-end-gui)
+4. [Input Processing](input-processing)
+5. [Interface](frontend-gui)
 6. [Future Development](#future-development)
 7. [License](#license)
 
