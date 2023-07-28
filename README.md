@@ -5,8 +5,8 @@ The Web Article Summarizer is a tool designed to summarize and analyze articles 
 1. [Overview](#implementation-overview)
 2. [Data](#data-for-training)
 3. [Models & Techniques](#models-and-techniques)
-4. [Input Processing](input-processing)
-5. [Interface](frontend-gui)
+4. [Input Processing](#input-processing)
+5. [Interface](#front-end-gui)
 6. [Future Development](#future-development)
 7. [License](#license)
 
@@ -16,17 +16,17 @@ Our application's models are trained on a dataset provided by Benzinga News, and
 ## Data for training
 The initial stage of the Web_Article_Summarizer is data collection. It utilizes the data from Benzinga News, which serves as the primary source of information to train our models. This raw data is then preprocessed using the SimHash methodology, which aids in the removal of duplicate news articles. This deduplication is a crucial step as it ensures that our model is trained on unique and diverse data, thus avoiding bias in predictions.
 
-## Models and Techniques 
+## Models and Techniques
 The training phase begins once the data has been cleaned and prepared. Three primary techniques are applied in this phase: Named Entity Recognition (NER) using the Spacy library, Latent Dirichlet Allocation (LDA) for topic modeling via Scikit-Learn, and a pre-trained T5 transformer for summarization.
 
 Firstly, the SimHash methodology is employed for data deduplication, ensuring our models are trained on unique and diverse news data. This is a crucial step in refining the quality of the dataset.NER is then employed to identify and classify named entities in the text, such as people, organizations, locations, etc. Concurrently, the LDA method helps in discerning the main topics present in the text data. Lastly, T5, a transformer pre-trained model, is used to provide succinct summaries of the articles' titles and bodies. This allows for a more granular and effective summarization, which contributes significantly to the final analysis.
 
 All these models and techniques are trained on the preprocessed news data, thereby ensuring highly accurate and insightful text summarization and analysis.
 
-## Input Processing 
+## Input Processing
 In the operational phase, when a user inputs a URL, the system built with Pypputeer parses the content from the URL and processes it using the trained models. The NER model identifies the named entities in the article, while the LDA model determines the topics discussed in the article.
 
-## Front-end GUI 
+## Front-end GUI
 The results obtained from the models are then computed to form the final summary and analysis of the article. The summary, including identified entities and topics, is presented to the user through an interactive GUI.
 
 ## Future Development
