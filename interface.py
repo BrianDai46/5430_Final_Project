@@ -1,7 +1,7 @@
 import tkinter as tk
 from scraper import Scraper
 import asyncio
-import json
+import json, os
 
 class Application(tk.Frame):
     def __init__(self, master=None, loop=None):
@@ -12,6 +12,7 @@ class Application(tk.Frame):
         self.urls = set()
         self.create_widgets()
         self.scraper = Scraper()
+        self.pages = []
         
     def create_widgets(self): 
         self.master.columnconfigure(0, weight=1)
@@ -45,8 +46,20 @@ class Application(tk.Frame):
         self.scrape_urls["command"] = self.startScraping
         self.scrape_urls.grid(row=3, column=0, columnspan=1, sticky="new")
 
+        self.pages = [] # Stores the text for each page
+        self.page_index = 0 # Stores the current page index
+
+        self.page_label = tk.Label(left_frame, text="Current page number: {0}".format(self.page_index + 1))
+        self.page_label.grid(row=5, column=0, columnspan=1, sticky="new")
+
+        self.prev_button = tk.Button(left_frame, text="<< Prev", command=self.prevPage)
+        self.prev_button.grid(row=6, column=0, sticky="new")
+
+        self.next_button = tk.Button(left_frame, text="Next >>", command=self.nextPage)
+        self.next_button.grid(row=7, column=0, sticky="new")
+        
         self.quit = tk.Button(left_frame, text="QUIT", fg="red",
-                              command=self.master.destroy)
+                              command=self.quitClient)
         self.quit.grid(row=4, column=0, columnspan=1, sticky="new")
         
     def storeUrl(self):
@@ -94,9 +107,28 @@ class Application(tk.Frame):
         self.doneScraping()
         with open('output/output.json', 'r') as f:
             content = json.load(f)
-        for title, context in content.items():
-            self.updateOutput(title + ':\n\n' + context)
-            break
+            self.pages = [(idx, title, context) for idx, (title, context) in enumerate(content.items())]
+            self.pageFormat()
+            
+    def pageFormat(self):
+        self.updateOutput("Title: " + self.pages[self.page_index][1] + '\n\nArticle:\n' + self.pages[self.page_index][2])
+    
+    def prevPage(self):
+        if self.page_index > 0:
+            self.page_index -= 1
+            self.pageFormat()
+            self.page_label["text"] = "Current page number: {0}".format(self.page_index + 1)
+
+    def nextPage(self):
+        if self.page_index < len(self.pages) - 1:
+            self.page_index += 1
+            self.pageFormat()
+            self.page_label["text"] = "Current page number: {0}".format(self.page_index + 1)
+            
+    def quitClient(self):
+        if os.path.exists('output/output.json'):
+            os.remove('output/output.json')
+        self.master.destroy()
     
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
@@ -104,3 +136,5 @@ root.geometry("755x317")
 root.title("5430 Final Project")
 app = Application(master=root, loop=loop)
 app.mainloop()
+# https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants
+# https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago

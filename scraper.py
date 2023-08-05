@@ -49,11 +49,6 @@ class Scraper():
         with open("output/output.json", "w") as json_file:
             json.dump(self.url_texts, json_file)
 
-""" example = {'https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants',
-           'https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago'} 
-
-scraper = Scraper()
-scraper.scrape_urls(example) """
 
 
 
