@@ -1,5 +1,6 @@
 import asyncio
 from pyppeteer import launch
+import json
 
 class Scraper():
     def __init__(self) -> None:
@@ -30,7 +31,7 @@ class Scraper():
         }''')
         title = ' '.join(title.split())
         body = ' '.join(body.split())
-        self.url_texts[title] = body.encode('utf-8')
+        self.url_texts[title] = body
         await page.close()
     
     async def setup(self):
@@ -45,6 +46,8 @@ class Scraper():
         for url in urls:
             loop.run_until_complete(self.extract_body_text(url))
         loop.run_until_complete(self.teardown())
+        with open("output/output.json", "w") as json_file:
+            json.dump(self.url_texts, json_file)
 
 """ example = {'https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants',
            'https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago'} 
