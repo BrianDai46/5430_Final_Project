@@ -6,6 +6,12 @@ import re
 from nltk.stem import WordNetLemmatizer
 from nltk.corpus import stopwords
 
+import platform
+print('pickle:', pickle.format_version)
+print('nltk:', nltk.__version__)
+print("Python version:")
+print(platform.python_version())
+
 # To make this work, make sure lda_model.pkl and tf_vectorizer.pkl are in the model_train directory
 def get_topic_keywords(lda_model, vectorizer, text, num_keywords):
     test_matrix = vectorizer.transform([text])
