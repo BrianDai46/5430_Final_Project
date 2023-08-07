@@ -4,6 +4,8 @@ import asyncio
 import json, os
 import collections
 from nlp_model.ner import NER
+from nlp_model.summarize import Summarizer
+from nlp_model.topic_model import TopicClassifer
 
 class Application(tk.Frame):
     def __init__(self, master=None, loop=None):
@@ -17,6 +19,9 @@ class Application(tk.Frame):
         self.pages = []
         self.process_data = collections.defaultdict(list)
         self.ner = NER()
+        self.summarizer = Summarizer()
+        self.topic_classifer = TopicClassifer()
+        self.process_status_code = 0
         
     def create_widgets(self): 
         # scraping frame
@@ -149,7 +154,7 @@ class Application(tk.Frame):
         self.enter_button["state"] = "normal"
         
     def startScraping(self):
-        self.onScraping()
+        #self.onScraping()
         self.loop.create_task(self.scrapeUrls(self.urls))
         
     def scrapeUrls(self, urls):
@@ -184,28 +189,64 @@ class Application(tk.Frame):
         self.master.destroy()
     
     def nerProcessing(self):
+        self.process_status_code = 1
         if not self.process_data["ner"]:
             for page in self.pages:
                 entities = self.ner.ner(page[2])
                 entities_count = collections.Counter(entities)
                 sorted_entities_count = sorted(entities_count.items(), key=lambda x:x[1], reverse=True)
                 self.process_data["ner"].append(sorted_entities_count)
+        self.nerFormat()
+                
+    def nerFormat(self):
         self.updateOutput("Most Mentioned Entities and Labels: \n\n" 
                           + "\n".join(["Mentioned Count: " + str(ner_data[1]) + "\nLabel: " 
                           + ner_data[0][1]  + "\nEntity: " + ner_data[0][0] + "\n"  for ner_data in self.process_data["ner"][self.page_index]])
                           , self.output2)
     
     def topicClassification(self):
-        pass
+        self.process_status_code = 2
+        if not self.process_data["topic_classification"]:
+            for page in self.pages:
+                topic_classification = self.topic_classifer.topic_model(page[2])
+                self.process_data["topic_classification"].append(topic_classification)
+        self.topicClassificationFormat()
+    
+    def topicClassificationFormat(self):
+        self.updateOutput("Topic Classification: \n\n" + self.process_data["topic_classification"][self.page_index], self.output2)
     
     def summarization(self):
-        pass
+        self.process_status_code = 3
+        if not self.process_data["summarize"]:
+            for page in self.pages:
+                summary = self.summarizer.summarize(page[2], 80)
+                self.process_data["summarize"].append(summary)
+        self.summaryFormat()
+        
+    def summaryFormat(self):
+        self.updateOutput("Summary: \n\n" + self.process_data["summarize"][self.page_index], self.output2)
     
     def nextScrapedPageProcessing(self):
-        pass
+        if self.page_index < len(self.pages) - 1:
+            self.page_index += 1
+            if self.process_status_code == 1:
+                self.nerProcessing()
+            elif self.process_status_code == 2:
+                self.topicClassificationFormat()
+            elif self.process_status_code == 3:
+                self.summaryFormat()
+            self.page_label_processing["text"] = "Current page number: {0}".format(self.page_index + 1)
     
     def prevScrapedPageProcessing(self):
-        pass
+        if self.page_index > 0:
+            self.page_index -= 1
+            if self.process_status_code == 1:
+                self.nerProcessing()
+            elif self.process_status_code == 2:
+                self.topicClassificationFormat()
+            elif self.process_status_code == 3:
+                self.summaryFormat()
+            self.page_label_processing["text"] = "Current page number: {0}".format(self.page_index + 1)
     
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
