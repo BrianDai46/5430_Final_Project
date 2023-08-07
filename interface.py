@@ -2,6 +2,10 @@ import tkinter as tk
 from scraper import Scraper
 import asyncio
 import json, os
+import collections
+from nlp_model.ner import NER
+from nlp_model.summarize import Summarizer
+from nlp_model.topic_model import TopicClassifer
 
 class Application(tk.Frame):
     def __init__(self, master=None, loop=None):
@@ -13,6 +17,11 @@ class Application(tk.Frame):
         self.create_widgets()
         self.scraper = Scraper()
         self.pages = []
+        self.process_data = collections.defaultdict(list)
+        self.ner = NER()
+        self.summarizer = Summarizer()
+        self.topic_classifer = TopicClassifer()
+        self.process_status_code = 0
         
     def create_widgets(self): 
         # scraping frame
@@ -52,17 +61,17 @@ class Application(tk.Frame):
         self.page_label = tk.Label(left_frame, text="Current page number: {0}".format(self.page_index + 1))
         self.page_label.grid(row=4, column=0, columnspan=1, sticky="new")
 
-        self.prev_button = tk.Button(left_frame, text="<< Prev", command=self.prevPage)
+        self.prev_button = tk.Button(left_frame, text="<< Prev", command=self.prevScrapedPage)
         self.prev_button.grid(row=5, column=0, sticky="new")
 
-        self.next_button = tk.Button(left_frame, text="Next >>", command=self.nextPage)
+        self.next_button = tk.Button(left_frame, text="Next >>", command=self.nextScrapedPage)
         self.next_button.grid(row=6, column=0, sticky="new")
         
         self.quit = tk.Button(left_frame, text="QUIT", fg="red",
                               command=self.quitClient)
         self.quit.grid(row=8, column=0, columnspan=1, sticky="new")
         
-        process_button = tk.Button(left_frame, text="Process Scraped Content", command=lambda: self.show_frame(frame2))
+        process_button = tk.Button(left_frame, text="Process Scraped Content", command=lambda: self.showFrame(frame2))
         process_button.grid(row=7, column=0, sticky="new")
         
         # processing frame
@@ -94,28 +103,21 @@ class Application(tk.Frame):
         self.page_label_processing = tk.Label(left_frame2, text="Current page number: {0}".format(self.page_index + 1))
         self.page_label_processing.grid(row=4, column=0, columnspan=1, sticky="new")
 
-        self.prev_button_processing = tk.Button(left_frame2, text="<< Prev", command=self.prevPageProcessing)
+        self.prev_button_processing = tk.Button(left_frame2, text="<< Prev", command=self.prevScrapedPageProcessing)
         self.prev_button_processing.grid(row=5, column=0, sticky="new")
 
-        self.next_button_processing = tk.Button(left_frame2, text="Next >>", command=self.nextPageProcessing)
+        self.next_button_processing = tk.Button(left_frame2, text="Next >>", command=self.nextScrapedPageProcessing)
         self.next_button_processing.grid(row=6, column=0, sticky="new")
 
-        back_button = tk.Button(left_frame2, text="Back", command=lambda: self.show_frame(frame1))
+        back_button = tk.Button(left_frame2, text="Back", command=lambda: self.showFrame(frame1))
         back_button.grid(row=7, column=0, sticky="new")
 
         quit_button = tk.Button(left_frame2, text="QUIT", fg="red", command=self.quitClient)
         quit_button.grid(row=8, column=0, columnspan=1, sticky="new")
-
-        self.scrollbar_processing = tk.Scrollbar(frame2)
-        self.output_processing = tk.Text(frame2, yscrollcommand=self.scrollbar_processing.set)
-        self.scrollbar_processing.grid(row=0, column=2, sticky="nsew")
-        self.output_processing.grid(row=0, column=1, sticky="nsew")
-        self.scrollbar_processing.config(command=self.output_processing.yview)
-        self.output_processing.config(state="disabled")
         
-        self.show_frame(frame1)
+        self.showFrame(frame1)
         
-    def show_frame(self, frame):
+    def showFrame(self, frame):
         frame.tkraise()
     
     def storeUrl(self):
@@ -130,16 +132,16 @@ class Application(tk.Frame):
             self.url_entry.delete(0, "end")
             self.url_entry.config(fg="black")
             
-    def updateOutput(self, text):
-        self.clearOutput()
-        self.output.config(state="normal")
-        self.output.insert("end", text)
-        self.output.config(state="disabled")
+    def updateOutput(self, text, chosen_output):
+        self.clearOutput(chosen_output)
+        chosen_output.config(state="normal")
+        chosen_output.insert("end", text)
+        chosen_output.config(state="disabled")
         
-    def clearOutput(self):
-        self.output.config(state="normal")
-        self.output.delete("1.0", "end")
-        self.output.config(state="disabled")
+    def clearOutput(self, chosen_output):
+        chosen_output.config(state="normal")
+        chosen_output.delete("1.0", "end")
+        chosen_output.config(state="disabled")
         
     def onScraping(self):
         self.scrape_urls["text"] = "Scraping..."
@@ -152,7 +154,7 @@ class Application(tk.Frame):
         self.enter_button["state"] = "normal"
         
     def startScraping(self):
-        self.onScraping()
+        #self.onScraping()
         self.loop.create_task(self.scrapeUrls(self.urls))
         
     def scrapeUrls(self, urls):
@@ -164,21 +166,21 @@ class Application(tk.Frame):
         with open('output/output.json', 'r') as f:
             content = json.load(f)
             self.pages = [(idx, title, context) for idx, (title, context) in enumerate(content.items())]
-            self.pageFormat()
+            self.pagesScrapedFormat()
             
-    def pageFormat(self):
-        self.updateOutput("Title: " + self.pages[self.page_index][1] + '\n\nArticle:\n' + self.pages[self.page_index][2])
+    def pagesScrapedFormat(self):
+        self.updateOutput("Title: " + self.pages[self.page_index][1] + '\n\nArticle:\n' + self.pages[self.page_index][2], self.output)
     
-    def prevPage(self):
+    def prevScrapedPage(self):
         if self.page_index > 0:
             self.page_index -= 1
-            self.pageFormat()
+            self.pagesScrapedFormat()
             self.page_label["text"] = "Current page number: {0}".format(self.page_index + 1)
 
-    def nextPage(self):
+    def nextScrapedPage(self):
         if self.page_index < len(self.pages) - 1:
             self.page_index += 1
-            self.pageFormat()
+            self.pagesScrapedFormat()
             self.page_label["text"] = "Current page number: {0}".format(self.page_index + 1)
             
     def quitClient(self):
@@ -187,19 +189,64 @@ class Application(tk.Frame):
         self.master.destroy()
     
     def nerProcessing(self):
-        pass
+        self.process_status_code = 1
+        if not self.process_data["ner"]:
+            for page in self.pages:
+                entities = self.ner.ner(page[2])
+                entities_count = collections.Counter(entities)
+                sorted_entities_count = sorted(entities_count.items(), key=lambda x:x[1], reverse=True)
+                self.process_data["ner"].append(sorted_entities_count)
+        self.nerFormat()
+                
+    def nerFormat(self):
+        self.updateOutput("Most Mentioned Entities and Labels: \n\n" 
+                          + "\n".join(["Mentioned Count: " + str(ner_data[1]) + "\nLabel: " 
+                          + ner_data[0][1]  + "\nEntity: " + ner_data[0][0] + "\n"  for ner_data in self.process_data["ner"][self.page_index]])
+                          , self.output2)
     
     def topicClassification(self):
-        pass
+        self.process_status_code = 2
+        if not self.process_data["topic_classification"]:
+            for page in self.pages:
+                topic_classification = self.topic_classifer.topic_model(page[2])
+                self.process_data["topic_classification"].append(topic_classification)
+        self.topicClassificationFormat()
+    
+    def topicClassificationFormat(self):
+        self.updateOutput("Topic Classification: \n\n" + self.process_data["topic_classification"][self.page_index], self.output2)
     
     def summarization(self):
-        pass
+        self.process_status_code = 3
+        if not self.process_data["summarize"]:
+            for page in self.pages:
+                summary = self.summarizer.summarize(page[2], 80)
+                self.process_data["summarize"].append(summary)
+        self.summaryFormat()
+        
+    def summaryFormat(self):
+        self.updateOutput("Summary: \n\n" + self.process_data["summarize"][self.page_index], self.output2)
     
-    def nextPageProcessing(self):
-        pass
+    def nextScrapedPageProcessing(self):
+        if self.page_index < len(self.pages) - 1:
+            self.page_index += 1
+            if self.process_status_code == 1:
+                self.nerProcessing()
+            elif self.process_status_code == 2:
+                self.topicClassificationFormat()
+            elif self.process_status_code == 3:
+                self.summaryFormat()
+            self.page_label_processing["text"] = "Current page number: {0}".format(self.page_index + 1)
     
-    def prevPageProcessing(self):
-        pass
+    def prevScrapedPageProcessing(self):
+        if self.page_index > 0:
+            self.page_index -= 1
+            if self.process_status_code == 1:
+                self.nerProcessing()
+            elif self.process_status_code == 2:
+                self.topicClassificationFormat()
+            elif self.process_status_code == 3:
+                self.summaryFormat()
+            self.page_label_processing["text"] = "Current page number: {0}".format(self.page_index + 1)
     
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
