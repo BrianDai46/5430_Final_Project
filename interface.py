@@ -5,7 +5,11 @@ import json, os
 import collections
 from nlp_model.ner import NER
 from nlp_model.summarize import Summarizer
-from nlp_model.topic_model import TopicClassifer
+from nlp_model.topic_model import *
+# https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants
+# https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago
+# https://www.amazon.com/exec/obidos/subst/home/home.html
+# https://www.pornhub.com/view_video.php?viewkey=648dd460e2745
 
 class Application(tk.Frame):
     def __init__(self, master=None, loop=None):
@@ -20,7 +24,6 @@ class Application(tk.Frame):
         self.process_data = collections.defaultdict(list)
         self.ner = NER()
         self.summarizer = Summarizer()
-        self.topic_classifer = TopicClassifer()
         self.process_status_code = 0
         
     def create_widgets(self): 
@@ -31,7 +34,7 @@ class Application(tk.Frame):
         left_frame = tk.Frame(frame1)
         left_frame.grid(row=0, column=0, sticky="nsew")
         
-        self.label = tk.Label(left_frame, text="NLP Application", font=("Helvetica", 16))
+        self.label = tk.Label(left_frame, text="Article Summarizer", font=("Comic Sans MS", 14))
         self.label.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
         
         self.scrollbar = tk.Scrollbar(left_frame)
@@ -47,10 +50,10 @@ class Application(tk.Frame):
         self.url_entry.bind("<FocusIn>", self.clearPlaceholder)
         self.url_entry.grid(row=1, column=0, sticky="new")
         
-        self.enter_button = tk.Button(left_frame, text="Enter", command=self.storeUrl)
+        self.enter_button = tk.Button(left_frame, text="Enter", font=("Comic Sans MS", 10) ,command=self.storeUrl)
         self.enter_button.grid(row=2, column=0, sticky="new") 
         
-        self.scrape_urls = tk.Button(left_frame)
+        self.scrape_urls = tk.Button(left_frame, font=("Comic Sans MS", 10))
         self.scrape_urls["text"] = "Scrape\nURL"
         self.scrape_urls["command"] = self.startScraping
         self.scrape_urls.grid(row=3, column=0, columnspan=1, sticky="new")
@@ -58,20 +61,20 @@ class Application(tk.Frame):
         self.pages = [] # Stores the text for each page
         self.page_index = 0 # Stores the current page index
 
-        self.page_label = tk.Label(left_frame, text="Current page number: {0}".format(self.page_index + 1))
+        self.page_label = tk.Label(left_frame, text="Current page number: {0}".format(self.page_index + 1), font=("Comic Sans MS", 10))
         self.page_label.grid(row=4, column=0, columnspan=1, sticky="new")
 
-        self.prev_button = tk.Button(left_frame, text="<< Prev", command=self.prevScrapedPage)
+        self.prev_button = tk.Button(left_frame, text="<< Prev", font=("Comic Sans MS", 10),command=self.prevScrapedPage)
         self.prev_button.grid(row=5, column=0, sticky="new")
 
-        self.next_button = tk.Button(left_frame, text="Next >>", command=self.nextScrapedPage)
+        self.next_button = tk.Button(left_frame, text="Next >>", font=("Comic Sans MS", 10), command=self.nextScrapedPage)
         self.next_button.grid(row=6, column=0, sticky="new")
         
-        self.quit = tk.Button(left_frame, text="QUIT", fg="red",
+        self.quit = tk.Button(left_frame, text="QUIT", font=("Comic Sans MS", 10), fg="red",
                               command=self.quitClient)
         self.quit.grid(row=8, column=0, columnspan=1, sticky="new")
         
-        process_button = tk.Button(left_frame, text="Process Scraped Content", command=lambda: self.showFrame(frame2))
+        process_button = tk.Button(left_frame, text="Process Scraped Content", font=("Comic Sans MS", 10), command=lambda: self.showFrame(frame2))
         process_button.grid(row=7, column=0, sticky="new")
         
         # processing frame
@@ -91,28 +94,28 @@ class Application(tk.Frame):
         self.scrollbar2.config(command=self.output2.yview)
         self.output2.config(state="disabled")
 
-        self.ner_button = tk.Button(left_frame2, text="NER", command=self.nerProcessing)
+        self.ner_button = tk.Button(left_frame2, text="NER", font=("Comic Sans MS", 10), command=self.nerProcessing)
         self.ner_button.grid(row=1, column=0, sticky="new")
 
-        self.topic_classification_button = tk.Button(left_frame2, text="Topic Classification", command=self.topicClassification)
+        self.topic_classification_button = tk.Button(left_frame2, text="Topic Classification", font=("Comic Sans MS", 10), command=self.topicClassification)
         self.topic_classification_button.grid(row=2, column=0, sticky="new")
 
-        self.summarization_button = tk.Button(left_frame2, text="Summarization", command=self.summarization)
+        self.summarization_button = tk.Button(left_frame2, text="Summarization", font=("Comic Sans MS", 10), command=self.summarization)
         self.summarization_button.grid(row=3, column=0, sticky="new")
 
-        self.page_label_processing = tk.Label(left_frame2, text="Current page number: {0}".format(self.page_index + 1))
+        self.page_label_processing = tk.Label(left_frame2, text="Current page number: {0}".format(self.page_index + 1), font=("Comic Sans MS", 10))
         self.page_label_processing.grid(row=4, column=0, columnspan=1, sticky="new")
 
-        self.prev_button_processing = tk.Button(left_frame2, text="<< Prev", command=self.prevScrapedPageProcessing)
+        self.prev_button_processing = tk.Button(left_frame2, text="<< Prev", font=("Comic Sans MS", 10), command=self.prevScrapedPageProcessing)
         self.prev_button_processing.grid(row=5, column=0, sticky="new")
 
-        self.next_button_processing = tk.Button(left_frame2, text="Next >>", command=self.nextScrapedPageProcessing)
+        self.next_button_processing = tk.Button(left_frame2, text="Next >>", font=("Comic Sans MS", 10), command=self.nextScrapedPageProcessing)
         self.next_button_processing.grid(row=6, column=0, sticky="new")
 
-        back_button = tk.Button(left_frame2, text="Back", command=lambda: self.showFrame(frame1))
+        back_button = tk.Button(left_frame2, text="Back", font=("Comic Sans MS", 10), command=lambda: self.showFrame(frame1))
         back_button.grid(row=7, column=0, sticky="new")
 
-        quit_button = tk.Button(left_frame2, text="QUIT", fg="red", command=self.quitClient)
+        quit_button = tk.Button(left_frame2, text="QUIT", font=("Comic Sans MS", 10), fg="red", command=self.quitClient)
         quit_button.grid(row=8, column=0, columnspan=1, sticky="new")
         
         self.showFrame(frame1)
@@ -208,7 +211,7 @@ class Application(tk.Frame):
         self.process_status_code = 2
         if not self.process_data["topic_classification"]:
             for page in self.pages:
-                topic_classification = self.topic_classifer.topic_model(page[2])
+                topic_classification = topic_model(page[2])
                 self.process_data["topic_classification"].append(topic_classification)
         self.topicClassificationFormat()
     
@@ -251,8 +254,6 @@ class Application(tk.Frame):
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
 root.geometry("755x317")
-root.title("5430 Final Project")
+root.title("Article Summarizer")
 app = Application(master=root, loop=loop)
 app.mainloop()
-# https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants
-# https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago

@@ -11,7 +11,7 @@ class Summarizer():
         preds = [self.tokenizer.decode(g, skip_special_tokens=True, clean_up_tokenization_spaces=True) for g in generated_ids]
         # Capitalize the first letter in each sentence.
         sentences = preds[0].split('. ')
-        capitalized_sentences = [s[0].upper() + s[1:] for s in sentences]
+        capitalized_sentences = [s[0].upper() + s[1:] if s else "" for s in sentences]
         capitalized_text = '. '.join(capitalized_sentences)
         if capitalized_text and not capitalized_text.endswith('.'):
             capitalized_text += '.'

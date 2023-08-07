@@ -15,7 +15,9 @@ class Scraper():
 
         title = await page.evaluate('''() => {
             let element = document.querySelector('h1'); 
-            return element.innerText;
+            if (element) {
+                return element.innerText;
+            }
         }''')
         
         body = await page.evaluate('''() => {
@@ -24,13 +26,21 @@ class Scraper():
 
             for (let i = 0; i < elements.length; i++) {
                 let element = elements[i];
-                texts.push(element.innerText);
+                if (element) {
+                    texts.push(element.innerText);
+                }
             }
 
             return texts.join(" ");
         }''')
-        title = ' '.join(title.split())
-        body = ' '.join(body.split())
+        if title:
+            title = ' '.join(title.split())
+        else:
+            title = ''
+        if body:
+            body = ' '.join(body.split())
+        else:
+            body = ''
         self.url_texts[title] = body
         await page.close()
     
