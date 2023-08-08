@@ -8,6 +8,7 @@ from nlp_model.summarize import Summarizer
 from nlp_model.topic_model import *
 # https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants
 # https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago
+# https://finance.yahoo.com/news/apple-stock-buybacks-are-still-in-full-swing-and-thats-good-news-for-warren-buffett-221513294.html
 # https://www.amazon.com/exec/obidos/subst/home/home.html
 # https://www.pornhub.com/view_video.php?viewkey=648dd460e2745
 
@@ -84,7 +85,7 @@ class Application(tk.Frame):
         left_frame2 = tk.Frame(frame2)
         left_frame2.grid(row=0, column=0, sticky="nsew")
 
-        self.label2 = tk.Label(left_frame2, text="NLP Application", font=("Helvetica", 16))
+        self.label2 = tk.Label(left_frame2, text="Article Summarizer", font=("Helvetica", 16))
         self.label2.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
         self.scrollbar2 = tk.Scrollbar(left_frame2)
