@@ -10,7 +10,6 @@ from nlp_model.topic_model import *
 # https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago
 # https://finance.yahoo.com/news/apple-stock-buybacks-are-still-in-full-swing-and-thats-good-news-for-warren-buffett-221513294.html
 # https://www.amazon.com/exec/obidos/subst/home/home.html
-# https://www.pornhub.com/view_video.php?viewkey=648dd460e2745
 
 class Application(tk.Frame):
     def __init__(self, master=None, loop=None):
@@ -254,7 +253,7 @@ class Application(tk.Frame):
     
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
-root.geometry("755x317")
+root.geometry("777x317")
 root.title("Article Summarizer")
 app = Application(master=root, loop=loop)
 app.mainloop()
