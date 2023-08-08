@@ -84,7 +84,7 @@ class Application(tk.Frame):
         left_frame2 = tk.Frame(frame2)
         left_frame2.grid(row=0, column=0, sticky="nsew")
 
-        self.label2 = tk.Label(left_frame2, text="Article Summarizer", font=("Helvetica", 16))
+        self.label2 = tk.Label(left_frame2, text="Article Summarizer", font=("Comic Sans MS", 10))
         self.label2.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
         self.scrollbar2 = tk.Scrollbar(left_frame2)
