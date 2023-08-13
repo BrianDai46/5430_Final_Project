@@ -6,9 +6,8 @@ import collections
 from nlp_model.ner import NER
 from nlp_model.summarize import Summarizer
 from nlp_model.topic_model import *
-# https://www.foxnews.com/politics/federal-judge-blocks-biden-administrations-asylum-policy-migrants
-# https://www.foxnews.com/sports/ex-nfl-linebacker-dismisses-colin-kaepernicks-latest-comeback-attempt-senior-prom-was-years-ago
 # https://finance.yahoo.com/news/apple-stock-buybacks-are-still-in-full-swing-and-thats-good-news-for-warren-buffett-221513294.html
+# https://www.foxbusiness.com/retail/multiple-walmart-stores-new-york-incidents-credit-card-skimmers-july
 # https://www.amazon.com/exec/obidos/subst/home/home.html
 
 class Application(tk.Frame):
@@ -34,7 +33,7 @@ class Application(tk.Frame):
         left_frame = tk.Frame(frame1)
         left_frame.grid(row=0, column=0, sticky="nsew")
         
-        self.label = tk.Label(left_frame, text="Article Summarizer", font=("Comic Sans MS", 14))
+        self.label = tk.Label(left_frame, text="Article Summarizer", font=("Comic Sans MS", 20))
         self.label.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
         
         self.scrollbar = tk.Scrollbar(left_frame)
@@ -84,7 +83,7 @@ class Application(tk.Frame):
         left_frame2 = tk.Frame(frame2)
         left_frame2.grid(row=0, column=0, sticky="nsew")
 
-        self.label2 = tk.Label(left_frame2, text="Article Summarizer", font=("Comic Sans MS", 10))
+        self.label2 = tk.Label(left_frame2, text="Article Summarizer", font=("Comic Sans MS", 20))
         self.label2.grid(row=0, column=0, sticky="nw", padx=10, pady=10)
 
         self.scrollbar2 = tk.Scrollbar(left_frame2)
@@ -253,7 +252,7 @@ class Application(tk.Frame):
     
 loop = asyncio.get_event_loop()     
 root = tk.Tk()
-root.geometry("777x317")
+root.geometry("855x317")
 root.title("Article Summarizer")
 app = Application(master=root, loop=loop)
 app.mainloop()
